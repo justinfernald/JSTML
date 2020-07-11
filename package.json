@@ -5,8 +5,12 @@
     "main": "App.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "budo App.js --d public/ --l --open"
+        "start": "node App.js",
+        "build": "browserify src/index.js -o public/bundle.js"
     },
     "author": "Justin Fernald",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "budo": "^11.6.4"
+    }
 }
