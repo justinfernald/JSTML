@@ -2,16 +2,16 @@ let { a, div, p } = require("../JSTML.js");
 
 let generatedDOM = a(
     div(
-        "hi there",
+        "This is JSTML",
         p(
             {style: "color: red"},
-            "im a paragraph"),
+            "I'm a paragraph"),
         div(
             div(
-                "hi",
+                "This is a quick example I whipped up.",
                 a(
                     {href: "https://justinfernald.com"},
-                    "hello there"
+                    "An anchor tag I am."
                 )
             )
         )
