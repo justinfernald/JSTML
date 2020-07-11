@@ -1,0 +1,12 @@
+{
+    "name": "jstml",
+    "version": "1.0.0",
+    "description": "Simple HTML in JavaScript",
+    "main": "App.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "budo App.js --d public/ --l --open"
+    },
+    "author": "Justin Fernald",
+    "license": "ISC"
+}
