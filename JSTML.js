@@ -113,6 +113,93 @@ const htmlTags = [
     "wbr",
 ];
 
+const events = {
+    onClick: "click",
+    onAbort: "abort",
+    onAfterPrint: "afterprint",
+    onAnimationEnd: "animationend",
+    onAnimationIteration: "animationiteration",
+    onAnimationStart: "animationstart",
+    onBeforePrint: "beforeprint",
+    onBeforeUnload: "beforeunload",
+    onBlur: "blur",
+    onCanPlay: "canplay",
+    onCanPlayThrough: "canplaythrough",
+    onChange: "change",
+    onClick: "click",
+    onContextMenu: "contextmenu",
+    onCopy: "copy",
+    onCut: "cut",
+    onDblClick: "dblclick",
+    onDoubleClick: "dblclick",
+    onDrag: "drag",
+    onDragEnd: "dragend",
+    onDragEnter: "dragenter",
+    onDragLeave: "dragleave",
+    onDragOver: "dragover",
+    onDragStart: "dragstart",
+    onDrop: "drop",
+    onDurationChange: "durationchange",
+    onEnded: "ended",
+    onError: "error",
+    onFocus: "focus",
+    onFocusIn: "focusin",
+    onFocusOut: "focusout",
+    onFullScreenChange: "fullscreenchange",
+    onFullScreenError: "fullscreenerror",
+    onHashChange: "hashchange",
+    onInput: "input",
+    onInvalid: "invalid",
+    onKeyDown: "keydown",
+    onKeyPress: "keypress",
+    onKeyUp: "keyup",
+    onLoad: "load",
+    onLoadedData: "loadeddata",
+    onLoadedMetadata: "loadedmetadata",
+    onLoadStart: "loadstart",
+    onMessage: "message",
+    onMouseDown: "mousedown",
+    onMouseEnter: "mouseenter",
+    onMouseLeave: "mouseleave",
+    onMouseMove: "mousemove",
+    onMouseOver: "mouseover",
+    onMouseOut: "mouseout",
+    onMouseUp: "mouseup",
+    onOffline: "offline",
+    onOnline: "online",
+    onOpen: "open",
+    onPageHide: "pagehide",
+    onPageShow: "pageshow",
+    onPaste: "paste",
+    onPause: "pause",
+    onPlay: "play",
+    onPlaying: "playing",
+    onProgress: "progress",
+    onRateChange: "ratechange",
+    onResize: "resize",
+    onReset: "reset",
+    onScroll: "scroll",
+    onSearch: "search",
+    onSeeked: "seeked",
+    onSeeking: "seeking",
+    onSelect: "select",
+    onShow: "show",
+    onStalled: "stalled",
+    onSubmit: "submit",
+    onSuspend: "suspend",
+    onTimeUpdate: "timeupdate",
+    onToggle: "toggle",
+    onTouchCancel: "touchcancel",
+    onTouchEnd: "touchend",
+    onTouchMove: "touchmove",
+    onTouchStart: "touchstart",
+    onTransitionEnd: "transitionend",
+    onUnload: "unload",
+    onVolumeChange: "volumechange",
+    onWaiting: "waiting",
+    onWheel: "wheel"
+}
+
 htmlTags.forEach((tag) => {
     exports[tag] = (attributes, ...children) => {
         return {
@@ -126,8 +213,12 @@ htmlTags.forEach((tag) => {
                 else if (typeof attributes == "string")
                     element.appendChild(document.createTextNode(attributes));
                 else
-                    for (let attribute in attributes)
-                        element.setAttribute(attribute, attributes[attribute]);
+                    for ([key, value] of Object.entries(attributes)) {
+                        if (events[key]) {
+                            element.addEventListener(events[key], value)
+                        } else
+                            element.setAttribute(key, value);
+                    }
                 for (let child of children)
                     element.appendChild(
                         typeof child == "string"
