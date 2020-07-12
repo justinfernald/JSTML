@@ -6,7 +6,7 @@ let generatedDOM = a(
         "This is JSTML",
         p(
             {
-                style: "color: red",
+                style: {color: "red", backgroundColor: "#444", padding: 10},
                 onClick: e => console.log(e),
             },
             "I'm a paragraph"

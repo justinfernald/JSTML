@@ -197,8 +197,67 @@ const events = {
     onUnload: "unload",
     onVolumeChange: "volumechange",
     onWaiting: "waiting",
-    onWheel: "wheel"
-}
+    onWheel: "wheel",
+};
+
+const defaultCSSPropertyUnits = {
+    animationDelay: "s",
+    backgroundSize: "px",
+    borderBottomLeftRadius: "px",
+    borderBottomRightRadius: "px",
+    borderBottomWidth: "px",
+    borderImageOutset: "px",
+    borderImageSlice: "%",
+    borderImageWidth: "px",
+    borderLeftWidth: "px",
+    borderRadius: "px",
+    borderRightWidth: "px",
+    borderSpacing: "px",
+    borderTopLeftRadius: "px",
+    borderTopRightRadius: "px",
+    borderTopWidth: "px",
+    borderWidth: "px",
+    bottom: "px",
+    columnGap: "px",
+    columnRuleWidth: "px",
+    columnWidth: "px",
+    flexBasis: "px",
+    fontSize: "em",
+    gridAutoColumns: "px",
+    gridAutoRows: "px",
+    gridColumnGap: "px",
+    gridGap: "px",
+    gridRowGap: "px",
+    gridTemplate: "px",
+    height: "px",
+    left: "px",
+    letterSpacing: "px",
+    margin: "px",
+    marginBottom: "px",
+    marginLeft: "px",
+    marginRight: "px",
+    marginTop: "px",
+    maxHeight: "px",
+    maxWidth: "px",
+    minHeight: "px",
+    minWidth: "px",
+    outlineOffset: "px",
+    outlineWidth: "px",
+    padding: "px",
+    paddingBottom: "px",
+    paddingLeft: "px",
+    paddingRight: "px",
+    paddingTop: "px",
+    perspective: "px",
+    right: "px",
+    textIndent: "px",
+    top: "px",
+    transition: "s",
+    transitionDelay: "s",
+    transitionDuration: "s",
+    width: "px",
+    wordSpacing: "px",
+};
 
 htmlTags.forEach((tag) => {
     exports[tag] = (attributes, ...children) => {
@@ -210,21 +269,38 @@ htmlTags.forEach((tag) => {
                 let element = document.createElement(tag);
                 if (attributes._type == "jstml")
                     element.appendChild(attributes.toDOM());
+                else if(attributes instanceof HTMLElement)
+                    element.appendChild(attributes);
                 else if (typeof attributes == "string")
                     element.appendChild(document.createTextNode(attributes));
                 else
                     for ([key, value] of Object.entries(attributes)) {
-                        if (events[key]) {
-                            element.addEventListener(events[key], value)
-                        } else
-                            element.setAttribute(key, value);
+                        if (events[key])
+                            element.addEventListener(events[key], value);
+                        else if (key == "style")
+                            Object.entries(value).forEach(
+                                ([property, styleValue]) =>
+                                    (element.style[property] =
+                                        (typeof styleValue == "number" &&
+                                        defaultCSSPropertyUnits[property]
+                                            ? styleValue +
+                                              defaultCSSPropertyUnits[
+                                                  property
+                                              ]
+                                            : styleValue))
+                            );
+                        else element.setAttribute(key, value);
                     }
-                for (let child of children)
-                    element.appendChild(
-                        typeof child == "string"
-                            ? document.createTextNode(child)
-                            : child.toDOM()
-                    );
+                for (let child of children) {
+                    if (child._type == "jstml")
+                        element.appendChild(child.toDOM());
+                    else if (child instanceof HTMLElement)
+                        element.appendChild(child);
+                    else if (typeof child == "string")
+                        element.appendChild(
+                            document.createTextNode(child)
+                        );
+                }
                 return element;
             },
             toHTML: () => {
