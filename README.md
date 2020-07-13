@@ -1,4 +1,4 @@
-# JSTML
+# JSTML (JavaScript Text Markup Language)
 
 ### Description
 
@@ -27,6 +27,7 @@ I am not planning to work on this that much as I am busy with other stuff, so it
 * Rebuild to use React.createElement
 * VSCode Extension for better tooling and formatting
 * Convert to TypeScript
+* Documentation on how to use JSTML
 
 ### Example
 
