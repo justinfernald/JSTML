@@ -1,5 +1,7 @@
 # JSTML (JavaScript Text Markup Language)
 
+Currently not working on this. If someone wants to contribute feel free to make pull requests.
+
 ### Description
 
 Tiny project I just wanted to make really quick to take a break. It is a simple HTML generator in native JavaScript Syntax. It is inspired from the Flutter syntax of generating views.
@@ -20,14 +22,15 @@ I am not planning to work on this that much as I am busy with other stuff, so it
 * Style support (outside of setting them by string with attributes)
 * Event support
 * State managment
-* Scoped styles
-* Inline CSS properties (adding hover event CSS in the attributes)
+* Inline CSS properties with scoped styles (adding hover event CSS in the attributes)
+    * Have attribute titled `css` then create Style Sheet based on object just the inline style along with css attributes
 * Hot Reload (maybe not)
 * Tooling to convert DOM Element to JSTML
 * Rebuild to use React.createElement
 * VSCode Extension for better tooling and formatting
 * Convert to TypeScript
 * Documentation on how to use JSTML
+* Making components simple (This is the essence of this library)
 
 ### Example
 

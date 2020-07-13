@@ -259,53 +259,122 @@ const defaultCSSPropertyUnits = {
     wordSpacing: "px",
 };
 
+const cssDestructure = {
+    borderRadius: {
+        bottomLeft: "borderBottomLeftRadius",
+        bottomRight: "borderBottomRightRadius",
+        topLeft: "borderTopLeftRadius",
+        topRight: "borderTopRightRadius",
+    },
+    margin: {
+        bottom: "marginBottom",
+        left: "marginLeft",
+        right: "marginRight",
+        top: "marginTop",
+    },
+    padding: {
+        bottom: "paddingBottom",
+        left: "paddingLeft",
+        right: "paddingRight",
+        top: "paddingTop",
+    },
+};
+
 htmlTags.forEach((tag) => {
-    exports[tag] = (attributes, ...children) => {
-        return {
-            _type: "jstml",
-            attributes,
-            children,
-            toDOM: () => {
-                let element = document.createElement(tag);
-                if (attributes._type == "jstml")
-                    element.appendChild(attributes.toDOM());
-                else if(attributes instanceof HTMLElement)
-                    element.appendChild(attributes);
-                else if (typeof attributes == "string")
-                    element.appendChild(document.createTextNode(attributes));
-                else
-                    for ([key, value] of Object.entries(attributes)) {
-                        if (events[key])
-                            element.addEventListener(events[key], value);
-                        else if (key == "style")
-                            Object.entries(value).forEach(
-                                ([property, styleValue]) =>
-                                    (element.style[property] =
-                                        (typeof styleValue == "number" &&
+    exports[tag] = (attributes, ...children) => createNode(tag, attributes, ...children)
+});
+
+const createNode = (tag, attributes, ...children) => {
+    return {
+        _type: "jstml",
+        tag,
+        attributes,
+        children,
+        toDOM: (root = true) => {
+            let element = document.createElement(tag);
+            if (root) element.setAttribute("jstml-root", "");
+            if (attributes == undefined) return element;
+            else if (attributes._type == "jstml")
+                element.appendChild(attributes.toDOM(false));
+            else if (
+                typeof attributes == "function" &&
+                attributes()._type == "jstml"
+            )
+                element.appendChild(attributes().toDOM(false));
+            else if (attributes instanceof HTMLElement)
+                element.appendChild(attributes);
+            else if (typeof attributes == "string")
+                element.appendChild(document.createTextNode(attributes));
+            else
+                for ([key, value] of Object.entries(attributes)) {
+                    if (events[key])
+                        element.addEventListener(events[key], value);
+                    else if (key == "style")
+                        Object.entries(value).forEach(
+                            ([property, styleValue]) => {
+                                if (
+                                    typeof styleValue == "object" &&
+                                    cssDestructure[property]
+                                ) {
+                                    Object.entries(styleValue).forEach(
+                                        ([shortProperty, nestedStyleValue]) => {
+                                            element.style[
+                                                cssDestructure[property][
+                                                    shortProperty
+                                                ]
+                                            ] =
+                                                typeof nestedStyleValue ==
+                                                    "number" &&
+                                                defaultCSSPropertyUnits[
+                                                    cssDestructure[property][
+                                                        shortProperty
+                                                    ]
+                                                ]
+                                                    ? nestedStyleValue +
+                                                      defaultCSSPropertyUnits[
+                                                          cssDestructure[
+                                                              property
+                                                          ][shortProperty]
+                                                      ]
+                                                    : nestedStyleValue;
+                                        }
+                                    );
+                                } else
+                                    element.style[property] =
+                                        typeof styleValue == "number" &&
                                         defaultCSSPropertyUnits[property]
                                             ? styleValue +
-                                              defaultCSSPropertyUnits[
-                                                  property
-                                              ]
-                                            : styleValue))
-                            );
-                        else element.setAttribute(key, value);
-                    }
-                for (let child of children) {
-                    if (child._type == "jstml")
-                        element.appendChild(child.toDOM());
-                    else if (child instanceof HTMLElement)
-                        element.appendChild(child);
-                    else if (typeof child == "string")
-                        element.appendChild(
-                            document.createTextNode(child)
+                                              defaultCSSPropertyUnits[property]
+                                            : styleValue;
+                            }
                         );
+                    else if (key == "class" || key == "className")
+                        element.classList.add(
+                            ...(Array.isArray(value)
+                                ? value.flatMap((x) =>
+                                      x.split ? x.split(" ") : x
+                                  )
+                                : value.split(" "))
+                        );
+                    else element.setAttribute(key, value);
                 }
-                return element;
-            },
-            toHTML: () => {
-                console.log("hi");
-            },
-        };
+            for (let child of children) {
+                if (child._type == "jstml")
+                    element.appendChild(child.toDOM(false));
+                else if (typeof child == "function" && child()._type == "jstml")
+                    element.appendChild(child().toDOM(false));
+                else if (child instanceof HTMLElement)
+                    element.appendChild(child);
+                else if (typeof child == "string")
+                    element.appendChild(document.createTextNode(child));
+            }
+
+            return element;
+        },
+        toHTML() {
+            return this.toDOM().outerHTML;
+        },
     };
-});
+};
+
+exports.createNode = createNode;
